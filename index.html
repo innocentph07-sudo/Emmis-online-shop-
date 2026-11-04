@@ -1,0 +1,167 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emmis Online Shopping</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#101010;color:white}
+header{background:#080808;padding:20px;text-align:center;border-bottom:1px solid #c9a227}
+.logo{font-size:27px;font-weight:bold;color:#e4bd55}
+header p{color:#bbb;font-size:13px}
+.hero{text-align:center;padding:55px 18px;background:linear-gradient(135deg,#242016,#080808)}
+.hero h1{font-size:32px;color:#f1cc62}
+.hero p{color:#ddd;line-height:1.6}
+.btn{display:inline-block;background:#d6ae42;color:#111;padding:12px 22px;border:0;border-radius:6px;font-weight:bold;text-decoration:none;cursor:pointer}
+.container{padding:20px;max-width:1100px;margin:auto}
+h2{color:#e5bd54}
+.search{width:100%;padding:14px;border-radius:7px;border:1px solid #555;background:#222;color:white;margin:12px 0}
+.categories{display:flex;gap:9px;overflow-x:auto;padding:10px 0}
+.categories button{background:#252525;color:white;border:1px solid #555;padding:10px 15px;border-radius:20px;white-space:nowrap;cursor:pointer}
+.categories button.active{background:#d6ae42;color:#111}
+.products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.card{background:#1d1d1d;border:1px solid #333;border-radius:10px;overflow:hidden}
+.card img{width:100%;height:145px;object-fit:cover;background:#333}
+.card-info{padding:12px}
+.card h3{font-size:15px;margin:5px 0}
+.price{color:#e5bd54;font-weight:bold;margin:10px 0}
+.card button{width:100%;padding:10px;background:#d6ae42;border:0;border-radius:5px;font-weight:bold;cursor:pointer}
+.cart{background:#1d1d1d;padding:17px;border-radius:10px;margin-top:25px}
+.cart-item{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid #444;font-size:13px}
+.cart button{cursor:pointer}
+footer{text-align:center;padding:25px;color:#aaa;background:#080808;margin-top:35px}
+@media(min-width:650px){.products{grid-template-columns:repeat(4,1fr)}.hero h1{font-size:45px}}
+</style>
+</head>
+<body>
+
+<header>
+<div class="logo">EMMIS</div>
+<h2>EMMIS ONLINE SHOPPING</h2>
+<p>Your favourite products, all in one place.</p>
+</header>
+
+<section class="hero">
+<h1>WELCOME TO EMMIS</h1>
+<p>Discover amazing products at affordable prices.<br>
+Shop with confidence and order easily!</p>
+<a href="#shop" class="btn">SHOP NOW</a>
+</section>
+
+<main class="container" id="shop">
+<h2>Our Products</h2>
+<input class="search" id="search" placeholder="Search for products..." oninput="render()">
+
+<div class="categories">
+<button class="active" onclick="setCategory('All',this)">All</button>
+<button onclick="setCategory('Fashion',this)">Fashion</button>
+<button onclick="setCategory('Electronics',this)">Electronics</button>
+<button onclick="setCategory('Accessories',this)">Accessories</button>
+<button onclick="setCategory('Beauty',this)">Beauty</button>
+</div>
+
+<div class="products" id="products"></div>
+
+<section class="cart">
+<h2>🛒 Your Shopping Cart</h2>
+<div id="cartItems">Your cart is empty.</div>
+<h3 id="total">Total: KSh 0</h3>
+<button class="btn" onclick="order()">ORDER ON WHATSAPP</button>
+</section>
+</main>
+
+<footer>
+<h3>EMMIS ONLINE SHOPPING</h3>
+<p>Thank you for shopping with us!</p>
+<p>© 2026 Emmis Online Shopping</p>
+</footer>
+
+<script>
+const products=[
+{name:"Classic Sneakers",price:2500,category:"Fashion",image:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500"},
+{name:"Stylish Watch",price:1800,category:"Accessories",image:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500"},
+{name:"Wireless Headphones",price:3500,category:"Electronics",image:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500"},
+{name:"Fashion Handbag",price:2200,category:"Fashion",image:"https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500"},
+{name:"Sunglasses",price:1200,category:"Accessories",image:"https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=500"},
+{name:"Beauty Products",price:1500,category:"Beauty",image:"https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=500"},
+{name:"Smartphone",price:15000,category:"Electronics",image:"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500"},
+{name:"Perfume",price:2800,category:"Beauty",image:"https://images.unsplash.com/photo-1541643600914-78b084683601?w=500"}
+];
+
+let category="All";
+let cart=[];
+
+function setCategory(c,button){
+category=c;
+document.querySelectorAll(".categories button").forEach(b=>b.classList.remove("active"));
+button.classList.add("active");
+render();
+}
+
+function render(){
+const search=document.getElementById("search").value.toLowerCase();
+const filtered=products.filter(p=>
+(category==="All"||p.category===category)&&p.name.toLowerCase().includes(search)
+);
+document.getElementById("products").innerHTML=filtered.map((p,i)=>`
+<div class="card">
+<img src="${p.image}" alt="${p.name}">
+<div class="card-info">
+<h3>${p.name}</h3>
+<div class="price">KSh ${p.price.toLocaleString()}</div>
+<button onclick="addToCart('${p.name}')">ADD TO CART</button>
+</div>
+</div>`).join("");
+}
+
+function addToCart(name){
+let item=cart.find(p=>p.name===name);
+if(item)item.qty++;
+else{
+let product=products.find(p=>p.name===name);
+cart.push({...product,qty:1});
+}
+showCart();
+}
+
+function showCart(){
+let total=0;
+document.getElementById("cartItems").innerHTML=cart.length?cart.map((p,i)=>{
+total+=p.price*p.qty;
+return `<div class="cart-item">
+<span>${p.name} × ${p.qty}</span>
+<span>KSh ${(p.price*p.qty).toLocaleString()}
+<button onclick="removeItem(${i})">❌</button></span>
+</div>`;
+}).join(""):"Your cart is empty.";
+document.getElementById("total").innerText="Total: KSh "+total.toLocaleString();
+}
+
+function removeItem(i){
+cart.splice(i,1);
+showCart();
+}
+
+function order(){
+if(!cart.length){
+alert("Please add products to your cart first.");
+return;
+}
+let message="Hello Emmis Online Shopping! I would like to order:\n";
+let total=0;
+cart.forEach(p=>{
+message+=p.name+" x "+p.qty+" = KSh "+(p.price*p.qty)+"\n";
+total+=p.price*p.qty;
+});
+message+="Total: KSh "+total+"\nPlease confirm availability and delivery.";
+// Replace the number below with your WhatsApp number.
+let phone="254700000000";
+window.open("https://wa.me/"+phone+"?text="+encodeURIComponent(message),"_blank");
+}
+
+render();
+</script>
+</body>
+</html>
